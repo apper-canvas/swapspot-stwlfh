@@ -1194,7 +1194,7 @@ export default function MainFeature() {
                     )}
                     
                     </div>
-                  </div>
+                    </motion.div>
               )}
             </AnimatePresence>
             
@@ -1222,11 +1222,14 @@ export default function MainFeature() {
               
               {step < 3 ? (
                 <motion.button
-                    e.preventDefault();
+                  whileTap={{ scale: 0.95 }}
+                  type="button"
+                  onClick={(e) => {
                     e.preventDefault(); // Prevent form submission
-                    e.preventDefault(); // Prevent form submission
+                    e.stopPropagation();
                     nextStep();
                   }}
+                  
                   className="btn-primary py-2"
                 >
                   Next
