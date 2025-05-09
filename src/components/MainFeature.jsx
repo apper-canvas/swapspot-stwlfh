@@ -1042,9 +1042,10 @@ export default function MainFeature() {
                   )}
               )}
               )}
-              </motion.div>
+            </AnimatePresence>
             
-            <AnimatePresence mode="wait">
+            <div className="mt-4">
+              <AnimatePresence mode="wait">
               {step === 3 && (
                 <motion.div
                   key="step3"
@@ -1202,6 +1203,7 @@ export default function MainFeature() {
                     </motion.div>
               )}
             </AnimatePresence>
+            </div>
             </div>
             
             <div className="flex justify-between mt-6">
