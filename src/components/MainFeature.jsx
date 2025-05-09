@@ -458,12 +458,13 @@ export default function MainFeature() {
           <form onSubmit={handleSubmit}>
             <AnimatePresence mode="wait">
               {step === 1 && (
+                <motion.div
                   key={`step1-${listingType}`}
-                  key="step1"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
+                >
                   {/* Buy Form Fields - Step 1 */}
                   {listingType === 'buy' && (
                     <>
@@ -569,7 +570,6 @@ export default function MainFeature() {
                     </>
                   )}
 
-                  {/* Sell Form Fields - Step 1 */}
                   {listingType === 'sell' && (
                   <>
                 >
@@ -1035,8 +1035,8 @@ export default function MainFeature() {
                     </div>
                     {errors.condition && <p className="text-red-500 text-xs mt-1">{errors.condition}</p>}
                   </div>
-                </motion.div>
-                  )}
+                )}
+              )}
               )}
               
               {step === 3 && (
@@ -1193,7 +1193,6 @@ export default function MainFeature() {
                     
                     </div>
                   </div>
-                </motion.div>
               )}
             </AnimatePresence>
             
@@ -1220,9 +1219,8 @@ export default function MainFeature() {
               )}
               
               {step < 3 ? (
-                <motion.button
                     e.preventDefault();
-                  onClick={(e) => {
+                    e.preventDefault(); // Prevent form submission
                     e.preventDefault(); // Prevent form submission
                     nextStep();
                   }}
