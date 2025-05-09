@@ -592,9 +592,13 @@ export default function MainFeature() {
                           type="button"
                           whileTap={{ scale: 0.95 }}
                           onClick={(e) => {
-                            e.preventDefault();
                             e.preventDefault(); // Prevent form submission
                             e.stopPropagation(); // Stop event propagation
+                            // Update the formData with the selected condition
+                            setFormData({
+                              ...formData,
+                              condition: condition
+                            });
                           }}
                           className={`py-2 px-3 text-center rounded-lg text-sm ${
                             formData.condition === condition
