@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import getIcon from '../utils/iconUtils';
@@ -12,10 +12,13 @@ export default function MainFeature() {
     condition: '',
     category: '',
     location: '',
+    files: []
   });
   const [errors, setErrors] = useState({});
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
   const [showForm, setShowForm] = useState(false);
   
   // Define icon components
@@ -33,6 +36,7 @@ export default function MainFeature() {
   const PlusIcon = getIcon('Plus');
   const RefreshCwIcon = getIcon('RefreshCw');
   const ShoppingBagIcon = getIcon('ShoppingBag');
+  const TrashIcon = getIcon('Trash2');
   const RepeatIcon = getIcon('Repeat');
   
   // Categories and conditions lists
@@ -46,6 +50,19 @@ export default function MainFeature() {
     'New', 'Like New', 'Good', 'Fair', 'Poor'
   ];
   
+  // File upload configuration
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_FILES = 5;
+  const ACCEPTED_FILE_TYPES = [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/heic',
+    'image/heif'
+  ];
+  
+  // Form change handler
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -60,6 +77,96 @@ export default function MainFeature() {
         [name]: ''
       });
     }
+  };
+  
+  // File change handler
+  const handleFileChange = (e) => {
+    const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
+    processFiles(selectedFiles);
+    
+    // Reset the input value to allow selecting the same file again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+  
+  // Process files (validation and preview)
+  const processFiles = (selectedFiles) => {
+    if (formData.files.length + selectedFiles.length > MAX_FILES) {
+      toast.error(`You can upload a maximum of ${MAX_FILES} files.`);
+      return;
+    }
+    
+    const validFiles = [];
+    const invalidFiles = [];
+    
+    selectedFiles.forEach(file => {
+      // Check file type
+      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+        invalidFiles.push({ file, reason: 'type' });
+        return;
+      }
+      
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+        invalidFiles.push({ file, reason: 'size' });
+        return;
+      }
+      
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      validFiles.push({ file, previewUrl });
+    });
+    
+    // Show toast messages for invalid files
+    if (invalidFiles.length > 0) {
+      const typeErrors = invalidFiles.filter(f => f.reason === 'type').length;
+      const sizeErrors = invalidFiles.filter(f => f.reason === 'size').length;
+      
+      if (typeErrors > 0) {
+        toast.error(`${typeErrors} file(s) were rejected. Only images are allowed.`);
+      }
+      
+      if (sizeErrors > 0) {
+        toast.error(`${sizeErrors} file(s) exceeded the 5MB size limit.`);
+      }
+    }
+    
+    // Add valid files to form state
+    if (validFiles.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        files: [...prev.files, ...validFiles]
+      }));
+      
+      toast.success(`${validFiles.length} file(s) added successfully.`);
+    }
+  };
+  
+  // Remove file handler
+  const removeFile = (index) => {
+    setFormData(prev => {
+      const updatedFiles = [...prev.files];
+      // Revoke the object URL to avoid memory leaks
+      URL.revokeObjectURL(updatedFiles[index].previewUrl);
+      updatedFiles.splice(index, 1);
+      return { ...prev, files: updatedFiles };
+    });
+    toast.info('File removed.');
+  };
+  
+  // Drag and drop handlers
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+  
+  const handleDragLeave = () => setIsDragging(false);
+  
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    processFiles(Array.from(e.dataTransfer.files));
   };
   
   const validateStep = () => {
@@ -107,6 +214,7 @@ export default function MainFeature() {
           condition: '',
           category: '',
           location: '',
+          files: [],
         });
         setStep(1);
         setShowForm(false);
@@ -125,6 +233,7 @@ export default function MainFeature() {
         condition: '',
         category: '',
         location: '',
+        files: [],
       });
       setStep(1);
       setErrors({});
@@ -339,15 +448,73 @@ export default function MainFeature() {
                         Photos
                       </span>
                     </label>
-                    <div className="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded-xl p-6 text-center">
-                      <CameraIcon size={24} className="mx-auto mb-2 text-surface-400" />
-                      <p className="text-sm text-surface-500 dark:text-surface-400 mb-2">Drag and drop photos here</p>
-                      <button 
-                        type="button"
-                        className="px-4 py-2 bg-surface-100 dark:bg-surface-700 rounded-lg text-sm font-medium"
-                      >
-                        Browse Files
-                      </button>
+                    <div 
+                      className={`border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 ${
+                        isDragging 
+                          ? 'border-primary bg-primary/5 dark:bg-primary/10' 
+                          : 'border-surface-200 dark:border-surface-700'
+                      }`}
+                      onDragEnter={handleDragEnter}
+                      onDragOver={handleDragEnter}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                    >
+                      {formData.files.length === 0 ? (
+                        <>
+                          <CameraIcon size={24} className="mx-auto mb-2 text-surface-400" />
+                          <p className="text-sm text-surface-500 dark:text-surface-400 mb-2">
+                            Drag and drop photos here
+                          </p>
+                          <button 
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="px-4 py-2 bg-surface-100 dark:bg-surface-700 rounded-lg text-sm font-medium hover:bg-surface-200 dark:hover:bg-surface-600 transition-colors"
+                          >
+                            Browse Files
+                          </button>
+                          <input 
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            multiple
+                            accept="image/*"
+                            className="hidden"
+                          />
+                          <p className="text-xs text-surface-400 mt-2">
+                            Max {MAX_FILES} images, 5MB per file
+                          </p>
+                        </>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
+                            {formData.files.map((file, index) => (
+                              <div key={index} className="relative group">
+                                <img 
+                                  src={file.previewUrl} 
+                                  alt={`Preview ${index}`}
+                                  className="w-full h-24 object-cover rounded-lg"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => removeFile(index)}
+                                  className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <TrashIcon size={16} />
+                                </button>
+                              </div>
+                            ))}
+                            {formData.files.length < MAX_FILES && (
+                              <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="w-full h-24 border-2 border-dashed border-surface-200 dark:border-surface-700 rounded-lg flex items-center justify-center"
+                              >
+                                <PlusIcon size={24} className="text-surface-400" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </motion.div>
