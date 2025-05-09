@@ -1043,11 +1043,11 @@ export default function MainFeature() {
               )}
               )}
               </motion.div>
-            <div>
-            </AnimatePresence>
+            
             <AnimatePresence mode="wait">
-             {step === 3 && (
+              {step === 3 && (
                 <motion.div
+                  key="step3"
                   key="step3"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
