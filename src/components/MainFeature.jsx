@@ -302,6 +302,7 @@ export default function MainFeature() {
       setStep(1);
       setErrors({});
     }
+  };
   return (
     <div className="mb-8">
       {!showForm ? (
@@ -1040,7 +1041,8 @@ export default function MainFeature() {
                   )}
               )}
               )}
-              
+            </AnimatePresence>
+            <AnimatePresence mode="wait">
               {step === 3 && (
                 <motion.div
                   key="step3"
