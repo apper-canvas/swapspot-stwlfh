@@ -1047,7 +1047,6 @@ export default function MainFeature() {
               
               <div className="mt-4">
               {step === 3 && (
-                {step === 3 && (
                   <motion.div
                     key="step3"
                   initial={{ opacity: 0, x: 20 }}
