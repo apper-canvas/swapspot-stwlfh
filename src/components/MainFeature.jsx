@@ -1041,15 +1041,15 @@ export default function MainFeature() {
                     </>
                   )}
               )}
+                </motion.div>
               )}
-            </AnimatePresence>
-            
-            <div className="mt-4">
-              <AnimatePresence mode="wait">
+              </AnimatePresence>
+              
+              <div className="mt-4">
               {step === 3 && (
-                <motion.div
-                  key="step3"
-                  key="step3"
+                {step === 3 && (
+                  <motion.div
+                    key="step3"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -1200,11 +1200,11 @@ export default function MainFeature() {
                     )}
                     
                     </div>
-                    </motion.div>
-              )}
-            </AnimatePresence>
-            </div>
-            </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              </div>
+            
             
             <div className="flex justify-between mt-6">
               {step > 1 ? (
