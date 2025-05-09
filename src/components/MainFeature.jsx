@@ -7,12 +7,21 @@ export default function MainFeature() {
   const [listingType, setListingType] = useState('sell');
   const [formData, setFormData] = useState({
     title: '',
+    lookingFor: '',
     description: '',
+    offerDescription: '',
     price: '',
+    minPrice: '',
+    maxPrice: '',
     condition: '',
+    preferredCondition: '',
     category: '',
+    preferredCategory: '',
     location: '',
-    files: []
+    files: [],
+    urgency: 'Not Urgent',
+    preferredBrands: '',
+    swapPreferences: ''
   });
   const [errors, setErrors] = useState({});
   const [step, setStep] = useState(1);
@@ -49,6 +58,12 @@ export default function MainFeature() {
   const conditions = [
     'New', 'Like New', 'Good', 'Fair', 'Poor'
   ];
+  
+  // Urgency options for Buy form
+  const urgencyOptions = [
+    'Not Urgent', 'Somewhat Urgent', 'Very Urgent'
+  ];
+  
   
   // File upload configuration
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -172,14 +187,41 @@ export default function MainFeature() {
   const validateStep = () => {
     const newErrors = {};
     
-    if (step === 1) {
+    // Shared fields for all listing types
+    if (step === 1 && listingType === 'sell') {
+      // Validation for Step 1 Sell form
       if (!formData.title.trim()) newErrors.title = 'Title is required';
       if (!formData.description.trim()) newErrors.description = 'Description is required';
-    } else if (step === 2) {
-      if (!formData.price && listingType !== 'swap') newErrors.price = 'Price is required';
+    } else if (step === 1 && listingType === 'buy') {
+      // Validation for Step 1 Buy form
+      if (!formData.lookingFor.trim()) newErrors.lookingFor = 'Please describe what you\'re looking for';
+      if (!formData.description.trim()) newErrors.description = 'Additional details are required';
+    } else if (step === 1 && listingType === 'swap') {
+      // Validation for Step 1 Swap form
+      if (!formData.title.trim()) newErrors.title = 'Title for your item is required';
+      if (!formData.offerDescription.trim()) newErrors.offerDescription = 'Please describe what you\'re offering';
+      if (!formData.lookingFor.trim()) newErrors.lookingFor = 'Please describe what you want in return';
+    } else if (step === 2 && listingType === 'sell') {
+      // Validation for Step 2 Sell form
+      if (!formData.price) newErrors.price = 'Price is required';
       if (!formData.condition) newErrors.condition = 'Condition is required';
       if (!formData.category) newErrors.category = 'Category is required';
+    } else if (step === 2 && listingType === 'buy') {
+      // Validation for Step 2 Buy form
+      if (!formData.minPrice) newErrors.minPrice = 'Minimum price is required';
+      if (!formData.maxPrice) newErrors.maxPrice = 'Maximum price is required';
+      if (formData.minPrice && formData.maxPrice && Number(formData.minPrice) > Number(formData.maxPrice)) {
+        newErrors.minPrice = 'Minimum price cannot be greater than maximum price';
+      }
+      if (!formData.preferredCategory) newErrors.preferredCategory = 'Category is required';
+    } else if (step === 2 && listingType === 'swap') {
+      // Validation for Step 2 Swap form
+      if (!formData.condition) newErrors.condition = 'Condition of your item is required';
+      if (!formData.preferredCondition) newErrors.preferredCondition = 'Preferred condition is required';
+      if (!formData.category) newErrors.category = 'Category is required';
+      if (!formData.preferredCategory) newErrors.preferredCategory = 'Preferred category is required';
     }
+
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -218,12 +260,21 @@ export default function MainFeature() {
           condition: '',
           category: '',
           location: '',
+          lookingFor: '',
           files: [],
+          offerDescription: '',
         });
+          minPrice: '',
+          maxPrice: '',
         setStep(1);
+          preferredCondition: '',
         setShowForm(false);
+          preferredCategory: '',
       }, 1500);
-    }
+          files: [],
+          urgency: 'Not Urgent',
+          preferredBrands: '',
+          swapPreferences: ''
   };
   
   const toggleForm = () => {
@@ -237,12 +288,21 @@ export default function MainFeature() {
         condition: '',
         category: '',
         location: '',
+        lookingFor: '',
         files: [],
+        offerDescription: '',
       });
+        minPrice: '',
+        maxPrice: '',
       setStep(1);
+        preferredCondition: '',
       setErrors({});
+        preferredCategory: '',
     }
-  };
+        files: [],
+        urgency: 'Not Urgent',
+        preferredBrands: '',
+        swapPreferences: ''
 
   return (
     <div className="mb-8">
@@ -400,12 +460,120 @@ export default function MainFeature() {
           <form onSubmit={handleSubmit}>
             <AnimatePresence mode="wait">
               {step === 1 && (
-                <motion.div
+                  key={`step1-${listingType}`}
                   key="step1"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
+                  {/* Buy Form Fields - Step 1 */}
+                  {listingType === 'buy' && (
+                    <>
+                      <div className="mb-4">
+                        <label htmlFor="lookingFor" className="block text-sm font-medium mb-2">
+                          <span className="flex items-center">
+                            <PenIcon size={16} className="mr-2" />
+                            What are you looking for?
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          id="lookingFor"
+                          name="lookingFor"
+                          value={formData.lookingFor}
+                          onChange={handleChange}
+                          placeholder="Describe the item you want to buy"
+                          className={`input-field ${errors.lookingFor ? 'border-red-500 dark:border-red-500' : ''}`}
+                        />
+                        {errors.lookingFor && <p className="text-red-500 text-xs mt-1">{errors.lookingFor}</p>}
+                      </div>
+                      
+                      <div className="mb-6">
+                        <label htmlFor="description" className="block text-sm font-medium mb-2">
+                          <span className="flex items-center">
+                            <InfoIcon size={16} className="mr-2" />
+                            Additional Details
+                          </span>
+                        </label>
+                        <textarea
+                          id="description"
+                          name="description"
+                          rows="4"
+                          value={formData.description}
+                          onChange={handleChange}
+                          placeholder="Specific features, brands, or other requirements..."
+                          className={`input-field resize-none ${errors.description ? 'border-red-500 dark:border-red-500' : ''}`}
+                        ></textarea>
+                        {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+                      </div>
+                    </>
+                  )}
+                  
+                  {/* Swap Form Fields - Step 1 */}
+                  {listingType === 'swap' && (
+                    <>
+                      <div className="mb-4">
+                        <label htmlFor="title" className="block text-sm font-medium mb-2">
+                          <span className="flex items-center">
+                            <PenIcon size={16} className="mr-2" />
+                            Item Title
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          id="title"
+                          name="title"
+                          value={formData.title}
+                          onChange={handleChange}
+                          placeholder="Title for the item you're offering"
+                          className={`input-field ${errors.title ? 'border-red-500 dark:border-red-500' : ''}`}
+                        />
+                        {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
+                      </div>
+                      
+                      <div className="mb-4">
+                        <label htmlFor="offerDescription" className="block text-sm font-medium mb-2">
+                          <span className="flex items-center">
+                            <InfoIcon size={16} className="mr-2" />
+                            What You're Offering
+                          </span>
+                        </label>
+                        <textarea
+                          id="offerDescription"
+                          name="offerDescription"
+                          rows="3"
+                          value={formData.offerDescription}
+                          onChange={handleChange}
+                          placeholder="Describe the item you're offering to swap..."
+                          className={`input-field resize-none ${errors.offerDescription ? 'border-red-500 dark:border-red-500' : ''}`}
+                        ></textarea>
+                        {errors.offerDescription && <p className="text-red-500 text-xs mt-1">{errors.offerDescription}</p>}
+                      </div>
+                      
+                      <div className="mb-4">
+                        <label htmlFor="lookingFor" className="block text-sm font-medium mb-2">
+                          <span className="flex items-center">
+                            <RepeatIcon size={16} className="mr-2" />
+                            What You Want in Return
+                          </span>
+                        </label>
+                        <textarea
+                          id="lookingFor"
+                          name="lookingFor"
+                          rows="3"
+                          value={formData.lookingFor}
+                          onChange={handleChange}
+                          placeholder="Describe what you're looking to receive in exchange..."
+                          className={`input-field resize-none ${errors.lookingFor ? 'border-red-500 dark:border-red-500' : ''}`}
+                        ></textarea>
+                        {errors.lookingFor && <p className="text-red-500 text-xs mt-1">{errors.lookingFor}</p>}
+                      </div>
+                    </>
+                  )}
+
+                  {/* Sell Form Fields - Step 1 */}
+                  {listingType === 'sell' && (
+                  <>
                 >
                   <div className="mb-4">
                     <label htmlFor="title" className="block text-sm font-medium mb-2">
@@ -420,7 +588,7 @@ export default function MainFeature() {
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
-                      placeholder={`${listingType === 'buy' ? 'What are you looking for?' : 'What are you offering?'}`}
+                      placeholder="What are you offering?"
                       className={`input-field ${errors.title ? 'border-red-500 dark:border-red-500' : ''}`}
                     />
                     {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
@@ -444,6 +612,9 @@ export default function MainFeature() {
                     ></textarea>
                     {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
                   </div>
+                  </>
+                  )}
+                  
                   
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-2">
@@ -526,13 +697,268 @@ export default function MainFeature() {
               
               {step === 2 && (
                 <motion.div
-                  key="step2"
+                  key={`step2-${listingType}`}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {listingType !== 'swap' && (
+                  {/* Buy Form Fields - Step 2 */}
+                  {listingType === 'buy' && (
+                    <>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium mb-2">
+                          <span className="flex items-center">
+                            <DollarSignIcon size={16} className="mr-2" />
+                            Price Range
+                          </span>
+                        </label>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="relative">
+                            <span className="absolute left-3 top-2.5 text-surface-500">$</span>
+                            <input
+                              type="number"
+                              id="minPrice"
+                              name="minPrice"
+                              value={formData.minPrice}
+                              onChange={handleChange}
+                              placeholder="Min"
+                              className={`input-field pl-8 ${errors.minPrice ? 'border-red-500 dark:border-red-500' : ''}`}
+                            />
+                            {errors.minPrice && <p className="text-red-500 text-xs mt-1">{errors.minPrice}</p>}
+                          </div>
+                          <div className="relative">
+                            <span className="absolute left-3 top-2.5 text-surface-500">$</span>
+                            <input
+                              type="number"
+                              id="maxPrice"
+                              name="maxPrice"
+                              value={formData.maxPrice}
+                              onChange={handleChange}
+                              placeholder="Max"
+                              className={`input-field pl-8 ${errors.maxPrice ? 'border-red-500 dark:border-red-500' : ''}`}
+                            />
+                            {errors.maxPrice && <p className="text-red-500 text-xs mt-1">{errors.maxPrice}</p>}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mb-4">
+                        <label htmlFor="preferredCategory" className="block text-sm font-medium mb-2">
+                          <span className="flex items-center">
+                            <TagIcon size={16} className="mr-2" />
+                            Category
+                          </span>
+                        </label>
+                        <select
+                          id="preferredCategory"
+                          name="preferredCategory"
+                          value={formData.preferredCategory}
+                          onChange={handleChange}
+                          className={`input-field ${errors.preferredCategory ? 'border-red-500 dark:border-red-500' : ''}`}
+                        >
+                          <option value="">Select a category</option>
+                          {categories.map(category => (
+                            <option key={category} value={category}>{category}</option>
+                          ))}
+                        </select>
+                        {errors.preferredCategory && <p className="text-red-500 text-xs mt-1">{errors.preferredCategory}</p>}
+                      </div>
+
+                      <div className="mb-4">
+                        <label htmlFor="preferredBrands" className="block text-sm font-medium mb-2">
+                          <span className="flex items-center">
+                            <TagIcon size={16} className="mr-2" />
+                            Preferred Brands (Optional)
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          id="preferredBrands"
+                          name="preferredBrands"
+                          value={formData.preferredBrands}
+                          onChange={handleChange}
+                          placeholder="e.g., Sony, Samsung, Apple"
+                          className="input-field"
+                        />
+                      </div>
+                      
+                      <div className="mb-6">
+                        <label htmlFor="urgency" className="block text-sm font-medium mb-2">
+                          <span className="flex items-center">
+                            <InfoIcon size={16} className="mr-2" />
+                            How Urgent Is Your Request?
+                          </span>
+                        </label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {urgencyOptions.map(option => (
+                            <motion.button
+                              key={option}
+                              type="button"
+                              whileTap={{ scale: 0.95 }}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setFormData({
+                                  ...formData,
+                                  urgency: option
+                                });
+                              }}
+                              className={`py-2 px-3 text-center rounded-lg text-sm ${
+                                formData.urgency === option
+                                  ? 'bg-primary text-white'
+                                  : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600'
+                              }`}
+                            >
+                              {option}
+                            </motion.button>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Swap Form Fields - Step 2 */}
+                  {listingType === 'swap' && (
+                    <>
+                      <div className="grid grid-cols-2 gap-6 mb-4">
+                        <div>
+                          <label htmlFor="category" className="block text-sm font-medium mb-2">
+                            <span className="flex items-center">
+                              <TagIcon size={16} className="mr-2" />
+                              Your Item's Category
+                            </span>
+                          </label>
+                          <select
+                            id="category"
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            className={`input-field ${errors.category ? 'border-red-500 dark:border-red-500' : ''}`}
+                          >
+                            <option value="">Select a category</option>
+                            {categories.map(category => (
+                              <option key={category} value={category}>{category}</option>
+                            ))}
+                          </select>
+                          {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
+                        </div>
+                        
+                        <div>
+                          <label htmlFor="preferredCategory" className="block text-sm font-medium mb-2">
+                            <span className="flex items-center">
+                              <TagIcon size={16} className="mr-2" />
+                              Desired Item's Category
+                            </span>
+                          </label>
+                          <select
+                            id="preferredCategory"
+                            name="preferredCategory"
+                            value={formData.preferredCategory}
+                            onChange={handleChange}
+                            className={`input-field ${errors.preferredCategory ? 'border-red-500 dark:border-red-500' : ''}`}
+                          >
+                            <option value="">Select a category</option>
+                            {categories.map(category => (
+                              <option key={category} value={category}>{category}</option>
+                            ))}
+                          </select>
+                          {errors.preferredCategory && <p className="text-red-500 text-xs mt-1">{errors.preferredCategory}</p>}
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-6 mb-6">
+                        <div>
+                          <label htmlFor="condition" className="block text-sm font-medium mb-2">
+                            <span className="flex items-center">
+                              <InfoIcon size={16} className="mr-2" />
+                              Your Item's Condition
+                            </span>
+                          </label>
+                          <div className="flex flex-wrap gap-2">
+                            {conditions.map(condition => (
+                              <motion.button
+                                key={condition}
+                                type="button"
+                                whileTap={{ scale: 0.95 }}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setFormData({
+                                    ...formData,
+                                    condition: condition
+                                  });
+                                }}
+                                className={`py-2 px-3 text-center rounded-lg text-xs ${
+                                  formData.condition === condition
+                                    ? 'bg-primary text-white'
+                                    : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600'
+                                }`}
+                              >
+                                {condition}
+                              </motion.button>
+                            ))}
+                          </div>
+                          {errors.condition && <p className="text-red-500 text-xs mt-1">{errors.condition}</p>}
+                        </div>
+                        
+                        <div>
+                          <label htmlFor="preferredCondition" className="block text-sm font-medium mb-2">
+                            <span className="flex items-center">
+                              <InfoIcon size={16} className="mr-2" />
+                              Desired Item's Condition
+                            </span>
+                          </label>
+                          <div className="flex flex-wrap gap-2">
+                            {conditions.map(condition => (
+                              <motion.button
+                                key={condition}
+                                type="button"
+                                whileTap={{ scale: 0.95 }}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setFormData({
+                                    ...formData,
+                                    preferredCondition: condition
+                                  });
+                                }}
+                                className={`py-2 px-3 text-center rounded-lg text-xs ${
+                                  formData.preferredCondition === condition
+                                    ? 'bg-primary text-white'
+                                    : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600'
+                                }`}
+                              >
+                                {condition}
+                              </motion.button>
+                            ))}
+                          </div>
+                          {errors.preferredCondition && <p className="text-red-500 text-xs mt-1">{errors.preferredCondition}</p>}
+                        </div>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <label htmlFor="swapPreferences" className="block text-sm font-medium mb-2">
+                          <span className="flex items-center">
+                            <InfoIcon size={16} className="mr-2" />
+                            Swap Preferences (Optional)
+                          </span>
+                        </label>
+                        <textarea
+                          id="swapPreferences"
+                          name="swapPreferences"
+                          rows="3"
+                          value={formData.swapPreferences}
+                          onChange={handleChange}
+                          placeholder="Any specific requirements for the swap? (e.g., local swap only, willing to ship, etc.)"
+                          className="input-field resize-none"
+                        ></textarea>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Sell Form Fields - Step 2 */}
+                  {listingType === 'sell' && (
                     <div className="mb-4">
                       <label htmlFor="price" className="block text-sm font-medium mb-2">
                         <span className="flex items-center">
@@ -554,13 +980,12 @@ export default function MainFeature() {
                       </div>
                       {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
                     </div>
-                  )}
                   
                   <div className="mb-4">
                     <label htmlFor="category" className="block text-sm font-medium mb-2">
                       <span className="flex items-center">
                         <TagIcon size={16} className="mr-2" />
-                        Category
+                        Item Category
                       </span>
                     </label>
                     <select
@@ -613,6 +1038,7 @@ export default function MainFeature() {
                     {errors.condition && <p className="text-red-500 text-xs mt-1">{errors.condition}</p>}
                   </div>
                 </motion.div>
+                  )}
               )}
               
               {step === 3 && (
@@ -655,30 +1081,118 @@ export default function MainFeature() {
                   </div>
                   
                   <div className="bg-surface-100 dark:bg-surface-700 p-4 rounded-xl mb-6">
-                    <h3 className="font-medium mb-2">Listing Summary</h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-surface-500 dark:text-surface-400">Type:</span>
-                        <span className="font-medium capitalize">{listingType}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-surface-500 dark:text-surface-400">Title:</span>
-                        <span className="font-medium">{formData.title}</span>
-                      </div>
-                      {listingType !== 'swap' && (
+                    
+                    {listingType === 'sell' && (
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-surface-500 dark:text-surface-400">Type:</span>
+                          <span className="font-medium capitalize">{listingType}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-surface-500 dark:text-surface-400">Title:</span>
+                          <span className="font-medium">{formData.title}</span>
+                        </div>
                         <div className="flex justify-between">
                           <span className="text-surface-500 dark:text-surface-400">Price:</span>
                           <span className="font-medium">${formData.price || '0'}</span>
                         </div>
-                      )}
-                      <div className="flex justify-between">
-                        <span className="text-surface-500 dark:text-surface-400">Category:</span>
-                        <span className="font-medium">{formData.category}</span>
+                        <div className="flex justify-between">
+                          <span className="text-surface-500 dark:text-surface-400">Category:</span>
+                          <span className="font-medium">{formData.category}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-surface-500 dark:text-surface-400">Condition:</span>
+                          <span className="font-medium">{formData.condition}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-surface-500 dark:text-surface-400">Photos:</span>
+                          <span className="font-medium">{formData.files.length} uploaded</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-surface-500 dark:text-surface-400">Condition:</span>
-                        <span className="font-medium">{formData.condition}</span>
+                    )}
+                    
+                    {listingType === 'buy' && (
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-surface-500 dark:text-surface-400">Type:</span>
+                          <span className="font-medium capitalize">{listingType}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-surface-500 dark:text-surface-400">Looking For:</span>
+                          <span className="font-medium">{formData.lookingFor}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-surface-500 dark:text-surface-400">Price Range:</span>
+                          <span className="font-medium">${formData.minPrice || '0'} - ${formData.maxPrice || '0'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-surface-500 dark:text-surface-400">Category:</span>
+                          <span className="font-medium">{formData.preferredCategory}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-surface-500 dark:text-surface-400">Urgency:</span>
+                          <span className="font-medium">{formData.urgency}</span>
+                        </div>
+                        {formData.preferredBrands && (
+                          <div className="flex justify-between">
+                            <span className="text-surface-500 dark:text-surface-400">Preferred Brands:</span>
+                            <span className="font-medium">{formData.preferredBrands}</span>
+                          </div>
+                        )}
                       </div>
+                    )}
+                    
+                    {listingType === 'swap' && (
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-surface-500 dark:text-surface-400">Type:</span>
+                          <span className="font-medium capitalize">{listingType}</span>
+                        </div>
+                        <div className="border-b border-surface-200 dark:border-surface-600 pb-2 mb-2">
+                          <div className="font-medium mb-1">Your Item:</div>
+                          <div className="flex justify-between">
+                            <span className="text-surface-500 dark:text-surface-400">Title:</span>
+                            <span className="font-medium">{formData.title}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-surface-500 dark:text-surface-400">Category:</span>
+                            <span className="font-medium">{formData.category}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-surface-500 dark:text-surface-400">Condition:</span>
+                            <span className="font-medium">{formData.condition}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-surface-500 dark:text-surface-400">Photos:</span>
+                            <span className="font-medium">{formData.files.length} uploaded</span>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div className="font-medium mb-1">Looking For:</div>
+                          <div className="flex justify-between">
+                            <span className="text-surface-500 dark:text-surface-400">Description:</span>
+                            <span className="font-medium line-clamp-1">{formData.lookingFor}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-surface-500 dark:text-surface-400">Category:</span>
+                            <span className="font-medium">{formData.preferredCategory}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-surface-500 dark:text-surface-400">Condition:</span>
+                            <span className="font-medium">{formData.preferredCondition}</span>
+                          </div>
+                        </div>
+                        
+                        {formData.swapPreferences && (
+                          <div className="flex justify-between mt-2 pt-2 border-t border-surface-200 dark:border-surface-600">
+                            <span className="text-surface-500 dark:text-surface-400">Swap Preferences:</span>
+                            <span className="font-medium text-right max-w-[60%] line-clamp-2">{formData.swapPreferences}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
                     </div>
                   </div>
                 </motion.div>
@@ -709,7 +1223,7 @@ export default function MainFeature() {
               
               {step < 3 ? (
                 <motion.button
-                  whileTap={{ scale: 0.95 }}
+                    e.preventDefault();
                   onClick={(e) => {
                     e.preventDefault(); // Prevent form submission
                     nextStep();
