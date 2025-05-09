@@ -246,7 +246,7 @@ export default function MainFeature() {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    if (validateStep()) {
+    if (validateStep()) { 
       setIsSubmitting(true);
       
       // Simulate API call
@@ -263,14 +263,12 @@ export default function MainFeature() {
           lookingFor: '',
           files: [],
           offerDescription: '',
-        });
+          minPrice: '',
           maxPrice: '',
-        setStep(1);
-        setShowForm(false);
-      }, 1500);
+          preferredCategory: '',
+          preferredCondition: '',
           urgency: 'Not Urgent',
           preferredBrands: '',
-          swapPreferences: ''
           swapPreferences: ''
         });
         setStep(1);
