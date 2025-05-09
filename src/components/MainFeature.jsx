@@ -290,19 +290,18 @@ export default function MainFeature() {
         lookingFor: '',
         files: [],
         offerDescription: '',
-      });
         minPrice: '',
         maxPrice: '',
-      setStep(1);
         preferredCondition: '',
-      setErrors({});
         preferredCategory: '',
-    }
         files: [],
         urgency: 'Not Urgent',
         preferredBrands: '',
         swapPreferences: ''
-
+      });
+      setStep(1);
+      setErrors({});
+    }
   return (
     <div className="mb-8">
       {!showForm ? (
