@@ -704,13 +704,12 @@ export default function MainFeature() {
               )}
               
               {step < 3 ? (
-                  whileTap={{ scale: 0.95 }}
+                <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={(e) => {
                     e.preventDefault(); // Prevent form submission
                     nextStep();
                   }}
-                  onClick={nextStep}
                   className="btn-primary py-2"
                 >
                   Next
