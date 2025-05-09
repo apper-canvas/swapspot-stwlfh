@@ -467,6 +467,7 @@ export default function MainFeature() {
                           </p>
                           <button 
                             type="button"
+                            type="button"
                             onClick={() => fileInputRef.current?.click()}
                             className="px-4 py-2 bg-surface-100 dark:bg-surface-700 rounded-lg text-sm font-medium hover:bg-surface-200 dark:hover:bg-surface-600 transition-colors"
                           >
@@ -587,7 +588,10 @@ export default function MainFeature() {
                           key={condition}
                           type="button"
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => setFormData({...formData, condition})}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setFormData({...formData, condition});
+                          }}
                           className={`py-2 px-3 text-center rounded-lg text-sm ${
                             formData.condition === condition
                               ? 'bg-primary text-white'
@@ -631,6 +635,7 @@ export default function MainFeature() {
                       <button
                         type="button"
                         className="text-primary text-sm flex items-center"
+                        onClick={(e) => e.preventDefault()}
                       >
                         <MapPinIcon size={16} className="mr-1" />
                         Use my current location
