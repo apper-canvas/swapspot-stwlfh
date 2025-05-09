@@ -276,6 +276,7 @@ export default function MainFeature() {
       }, 1500);
     }
   
+  };
   const toggleForm = () => {
     setShowForm(!showForm);
     // Reset form when opening
@@ -1041,6 +1042,7 @@ export default function MainFeature() {
                   )}
               )}
               )}
+              </motion.div>
             </AnimatePresence>
             <AnimatePresence mode="wait">
               {step === 3 && (
