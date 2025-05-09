@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
 import MainFeature from '../components/MainFeature';
 import getIcon from '../utils/iconUtils';
+import { addToCart } from '../store/cartSlice';
 
 // Demo data for listings
 const DEMO_LISTINGS = [
@@ -109,6 +111,14 @@ export default function Home() {
   const SearchIcon = getIcon('Search');
   const FilterIcon = getIcon('SlidersHorizontal');
   const RefreshIcon = getIcon('RefreshCw');
+  const ShoppingCartIcon = getIcon('ShoppingCart');
+  
+  const dispatch = useDispatch();
+  
+  const handleAddToCart = (listing) => {
+    dispatch(addToCart(listing));
+    toast.success(`${listing.title} added to cart!`);
+  };
   
   // Filter listings when search or category changes
   useEffect(() => {
@@ -286,12 +296,22 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleContact(listing)}
-                    className="btn-primary py-1.5 px-4 text-sm rounded-lg"
-                  >
-                    Contact
+                  <div className="flex space-x-2">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleAddToCart(listing)}
+                      className="btn-primary py-1.5 px-3 text-sm rounded-lg flex items-center"
+                    >
+                      <ShoppingCartIcon size={16} className="mr-1" />
+                      Add to Cart
+                    </motion.button>
+                    
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleContact(listing)}
+                      className="py-1.5 px-3 text-sm rounded-lg border border-surface-300 dark:border-surface-600"
+                    >
+                      Contact
                   </motion.button>
                 </div>
               </div>

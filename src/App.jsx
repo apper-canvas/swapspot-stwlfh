@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import getIcon from './utils/iconUtils';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
+import CartIcon from './components/CartIcon';
+import CartDropdown from './components/CartDropdown';
 
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -59,6 +61,7 @@ function App() {
             </motion.div>
             
             <div className="flex items-center space-x-3">
+              <CartIcon />
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -134,6 +137,9 @@ function App() {
       </nav>
 
       {/* Toast Container for notifications */}
+      {/* Shopping Cart Dropdown */}
+      <CartDropdown />
+      
       <ToastContainer
         position="top-right"
         autoClose={3000}
