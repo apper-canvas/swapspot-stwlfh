@@ -186,9 +186,13 @@ export default function MainFeature() {
   };
   
   const nextStep = () => {
+    // Prevent proceeding if validation fails
     if (validateStep()) {
-      setStep(step + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (step < 3) {
+        setStep(step + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        toast.info(`Step ${step} completed! Moving to step ${step + 1}`);
+      }
     }
   };
   
@@ -466,8 +470,7 @@ export default function MainFeature() {
                             Drag and drop photos here
                           </p>
                           <button 
-                            type="button"
-                            type="button"
+                            type="button" 
                             onClick={() => fileInputRef.current?.click()}
                             className="px-4 py-2 bg-surface-100 dark:bg-surface-700 rounded-lg text-sm font-medium hover:bg-surface-200 dark:hover:bg-surface-600 transition-colors"
                           >
@@ -590,7 +593,8 @@ export default function MainFeature() {
                           whileTap={{ scale: 0.95 }}
                           onClick={(e) => {
                             e.preventDefault();
-                            setFormData({...formData, condition});
+                            e.preventDefault(); // Prevent form submission
+                            e.stopPropagation(); // Stop event propagation
                           }}
                           className={`py-2 px-3 text-center rounded-lg text-sm ${
                             formData.condition === condition
@@ -635,7 +639,10 @@ export default function MainFeature() {
                       <button
                         type="button"
                         className="text-primary text-sm flex items-center"
-                        onClick={(e) => e.preventDefault()}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
                       >
                         <MapPinIcon size={16} className="mr-1" />
                         Use my current location
@@ -697,9 +704,12 @@ export default function MainFeature() {
               )}
               
               {step < 3 ? (
-                <motion.button
                   whileTap={{ scale: 0.95 }}
-                  type="button"
+                  whileTap={{ scale: 0.95 }}
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent form submission
+                    nextStep();
+                  }}
                   onClick={nextStep}
                   className="btn-primary py-2"
                 >
