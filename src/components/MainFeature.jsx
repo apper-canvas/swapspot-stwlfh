@@ -572,7 +572,7 @@ export default function MainFeature() {
 
                   {listingType === 'sell' && (
                   <>
-                >
+                  
                   <div className="mb-4">
                     <label htmlFor="title" className="block text-sm font-medium mb-2">
                       <span className="flex items-center">
@@ -1221,6 +1221,7 @@ export default function MainFeature() {
               )}
               
               {step < 3 ? (
+                <motion.button
                     e.preventDefault();
                     e.preventDefault(); // Prevent form submission
                     e.preventDefault(); // Prevent form submission
