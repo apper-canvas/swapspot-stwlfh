@@ -264,18 +264,19 @@ export default function MainFeature() {
           files: [],
           offerDescription: '',
         });
-          minPrice: '',
           maxPrice: '',
         setStep(1);
-          preferredCondition: '',
         setShowForm(false);
-          preferredCategory: '',
       }, 1500);
-          files: [],
           urgency: 'Not Urgent',
           preferredBrands: '',
           swapPreferences: ''
-  };
+          swapPreferences: ''
+        });
+        setStep(1);
+        setShowForm(false);
+      }, 1500);
+    }
   
   const toggleForm = () => {
     setShowForm(!showForm);
