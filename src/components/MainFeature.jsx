@@ -1045,13 +1045,14 @@ export default function MainFeature() {
               )}
               </AnimatePresence>
               
-              <div className="mt-4">
-              {step === 3 && (
-                  <motion.div
-                    key="step3"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
+                <AnimatePresence mode="wait">
+                  {step === 3 && (
+                    <motion.div
+                      key="step3"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
                   transition={{ duration: 0.3 }}
                 >
                   <div className="mb-6">
@@ -1201,8 +1202,8 @@ export default function MainFeature() {
                     </div>
                   </motion.div>
                 )}
-              </AnimatePresence>
-              </div>
+                </AnimatePresence>
+             </div>
             
             
             <div className="flex justify-between mt-6">
