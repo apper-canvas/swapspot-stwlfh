@@ -314,6 +314,7 @@ export default function Home() {
                       Contact
                   </motion.button>
                 </div>
+                  </div>
               </div>
             </motion.div>
           ))}
