@@ -957,7 +957,8 @@ export default function MainFeature() {
 
                   {/* Sell Form Fields - Step 2 */}
                   {listingType === 'sell' && (
-                    <div className="mb-4">
+                    <>
+                      <div className="mb-4">
                       <label htmlFor="price" className="block text-sm font-medium mb-2">
                         <span className="flex items-center">
                           <DollarSignIcon size={16} className="mr-2" />
@@ -977,65 +978,66 @@ export default function MainFeature() {
                         />
                       </div>
                       {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
-                    </div>
-                  
-                  <div className="mb-4">
-                    <label htmlFor="category" className="block text-sm font-medium mb-2">
-                      <span className="flex items-center">
-                        <TagIcon size={16} className="mr-2" />
-                        Item Category
-                      </span>
-                    </label>
-                    <select
-                      id="category"
-                      name="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      className={`input-field ${errors.category ? 'border-red-500 dark:border-red-500' : ''}`}
-                    >
-                      <option value="">Select a category</option>
-                      {categories.map(category => (
-                        <option key={category} value={category}>{category}</option>
-                      ))}
-                    </select>
-                    {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
-                  </div>
-                  
-                  <div className="mb-6">
-                    <label htmlFor="condition" className="block text-sm font-medium mb-2">
-                      <span className="flex items-center">
-                        <InfoIcon size={16} className="mr-2" />
-                        Condition
-                      </span>
-                    </label>
-                    <div className="grid grid-cols-5 gap-2">
-                      {conditions.map(condition => (
-                        <motion.button
-                          key={condition}
-                          type="button"
-                          whileTap={{ scale: 0.95 }}
-                          onClick={(e) => {
-                            e.preventDefault(); // Prevent form submission
-                            e.stopPropagation(); // Stop event propagation
-                            // Update the formData with the selected condition
-                            setFormData({
-                              ...formData,
-                              condition: condition
-                            });
-                          }}
-                          className={`py-2 px-3 text-center rounded-lg text-sm ${
-                            formData.condition === condition
-                              ? 'bg-primary text-white'
-                              : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600'
-                          }`}
+                      </div>
+                      
+                      <div className="mb-4">
+                        <label htmlFor="category" className="block text-sm font-medium mb-2">
+                          <span className="flex items-center">
+                            <TagIcon size={16} className="mr-2" />
+                            Item Category
+                          </span>
+                        </label>
+                        <select
+                          id="category"
+                          name="category"
+                          value={formData.category}
+                          onChange={handleChange}
+                          className={`input-field ${errors.category ? 'border-red-500 dark:border-red-500' : ''}`}
                         >
-                          {condition}
-                        </motion.button>
-                      ))}
-                    </div>
-                    {errors.condition && <p className="text-red-500 text-xs mt-1">{errors.condition}</p>}
-                  </div>
-                )}
+                          <option value="">Select a category</option>
+                          {categories.map(category => (
+                            <option key={category} value={category}>{category}</option>
+                          ))}
+                        </select>
+                        {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
+                      </div>
+                      
+                      <div className="mb-6">
+                        <label htmlFor="condition" className="block text-sm font-medium mb-2">
+                          <span className="flex items-center">
+                            <InfoIcon size={16} className="mr-2" />
+                            Condition
+                          </span>
+                        </label>
+                        <div className="grid grid-cols-5 gap-2">
+                          {conditions.map(condition => (
+                            <motion.button
+                              key={condition}
+                              type="button"
+                              whileTap={{ scale: 0.95 }}
+                              onClick={(e) => {
+                                e.preventDefault(); // Prevent form submission
+                                e.stopPropagation(); // Stop event propagation
+                                // Update the formData with the selected condition
+                                setFormData({
+                                  ...formData,
+                                  condition: condition
+                                });
+                              }}
+                              className={`py-2 px-3 text-center rounded-lg text-sm ${
+                                formData.condition === condition
+                                  ? 'bg-primary text-white'
+                                  : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600'
+                              }`}
+                            >
+                              {condition}
+                            </motion.button>
+                          ))}
+                        </div>
+                        {errors.condition && <p className="text-red-500 text-xs mt-1">{errors.condition}</p>}
+                      </div>
+                    </>
+                  )}
               )}
               )}
               
